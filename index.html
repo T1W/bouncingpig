@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Bouncing Piggies</title>
+</head>
+<body style="margin:0">
+<script src="matter.min.js"></script>
+<script>
+var Engine = Matter.Engine,
+	Render = Matter.Render,
+	Runner = Matter.Runner,
+	Composites = Matter.Composites,
+	Common = Matter.Common,
+	Constraint = Matter.Constraint,
+	MouseConstraint = Matter.MouseConstraint,
+	Mouse = Matter.Mouse,
+	Composite = Matter.Composite,
+	Bodies = Matter.Bodies;
+	Events = Matter.Events;
+
+var engine = Engine.create({
+	gravity: {
+		scale: 0.0025
+	}
+}),
+	world = engine.world;
+
+var render = Render.create({
+	element: document.body,
+	engine: engine,
+	options: {
+		width: 1025,
+		height: 600,
+		showAngleIndicator: false,
+		wireframes: false
+	}
+});
+
+var worldWidth = 1000;
+var worldHeight = 600;
+
+Render.run(render);
+
+var runner = Runner.create();
+Runner.run(runner, engine);
+
+var wall =	Bodies.rectangle(780, 600, 30, 540, { isStatic: true, render: {fillStyle: "#06b2d8"} });
+
+Composite.add(world, [
+	// walls
+	Bodies.rectangle(worldWidth/2, 0, worldWidth, 50, { isStatic: true, render: {fillStyle: "#06b2d8"} }),
+	Bodies.rectangle(worldWidth/2, worldHeight, worldWidth, 50, { isStatic: true, render: {fillStyle: "#06b2d8"}}),
+	wall,
+	Bodies.rectangle(worldWidth, worldHeight/2, 50, worldHeight, { isStatic: true , render: {fillStyle: "#06b2d8"}}),
+	Bodies.rectangle(0, worldHeight/2, 50, worldHeight, { isStatic: true, render: {fillStyle: "#06b2d8"} }),
+	Bodies.rectangle(worldWidth/2, 555, 950, 40, { isStatic: true, render: {fillStyle: "#5cd2ec"} })
+]);
+
+var pineapplePig = Bodies.circle(50, 100, 37.5, {
+	radius: 37.5,
+	density: 0.0001,
+	friction: 0.2,
+	frictionStatic: 0.2,
+	restitution: 1,
+	render: {
+		sprite: {
+			xScale: 0.15,
+			yScale: 0.15,
+			texture: 'images/pineapplepig.png'
+		}
+	}
+});
+Composite.add(world, [pineapplePig]);
+
+var strawberryPig = Bodies.circle(150, 100, 40, {
+	radius: 40,
+	density: 0.0001,
+	friction: 0.2,
+	frictionStatic: 0.2,
+	restitution: 0.9,
+	render: {
+		sprite: {
+			xScale: 0.16,
+			yScale: 0.16,
+			texture: 'images/strawberrypig.png'
+		}
+	}
+});
+Composite.add(world, [strawberryPig]);
+
+var bigPig = Bodies.circle(150, 250, 50, {
+	radius: 50,
+	density: 0.0001,
+	friction: 0.2,
+	frictionStatic: 0.2,
+	restitution: 0.85,
+	render: {
+		sprite: {
+			xScale: 0.2,
+			yScale: 0.2,
+			texture: 'images/bigpig.png'
+		}
+	}
+});
+Composite.add(world, [bigPig]);
+
+var flyPig = Bodies.circle(350, 250, 52.5, {
+	radius: 52.5,
+	density: 0.0001,
+	friction: 0.2,
+	frictionStatic: 0.2,
+	restitution: 0.75,
+	render: {
+		sprite: {
+			xScale: 0.21,
+			yScale: 0.21,
+			texture: 'images/flypig.png'
+		}
+	}
+});
+Composite.add(world, [flyPig]);
+
+var valentinePig = Bodies.circle(250, 250, 35, {
+	radius: 35,
+	density: 0.0001,
+	friction: 0.2,
+	frictionStatic: 0.2,
+	restitution: 0.8,
+	frictionAir: 0.02,
+	render: {
+		sprite: {
+			xScale: 0.14,
+			yScale: 0.14,
+			texture: 'images/valentinepig.png'
+		}
+	}
+});
+Composite.add(world, [valentinePig]);
+
+var jellyPig = Bodies.circle(250, 100, 36, {
+	radius: 36,
+	density: 0.0001,
+	friction: 0.2,
+	frictionStatic: 0.2,
+	restitution: 0.8,
+	render: {
+		sprite: {
+			xScale: 0.144,
+			yScale: 0.144,
+			texture: 'images/jellypig.png'
+		}
+	}
+});
+Composite.add(world, [jellyPig]);
+
+var piggies = [bigPig, flyPig, strawberryPig, pineapplePig, jellyPig, valentinePig];
+
+var springBlock = Bodies.rectangle(500, 480, 150, 25, {render: {fillStyle: "#c00000"}});
+
+var constraint = Constraint.create({
+		pointA: { x: 420, y: 550 },
+		bodyB: springBlock,
+		pointB: { x: 50, y: 0 },
+		stiffness: 0.02,
+		render: {
+			visible: false
+		}
+});
+
+var constraint2 = Constraint.create({
+		pointA: { x: 580, y: 550 },
+		bodyB: springBlock,
+		pointB: { x: -50, y: 0 },
+		stiffness: 0.2,
+		render: {
+			visible: false
+		}
+});
+
+var constraint3 = Constraint.create({
+		pointA: { x: 500, y: 550 },
+		bodyB: springBlock,
+		pointB: { x: 0, y: 0 },
+		stiffness: 0.01,
+		render: {
+			visible: true
+		}
+});
+
+var constraint4 = Constraint.create({
+		pointA: { x: 450, y: 550 },
+		bodyB: springBlock,
+		pointB: { x: -50, y: 0 },
+		stiffness: 0.01,
+		render: {
+			visible: false
+		}
+});
+
+var constraint5 = Constraint.create({
+		pointA: { x: 550, y: 550 },
+		bodyB: springBlock,
+		pointB: { x: 50, y: 0 },
+		stiffness: 0.01,
+		render: {
+			visible: false
+		}
+});
+
+var spring = Composite.create();
+Composite.add(spring, [springBlock, constraint, constraint2, constraint3, constraint4, constraint5]);
+Composite.add(world, spring);
+
+var mouse = Mouse.create(render.canvas),
+mouseConstraint = MouseConstraint.create(engine, {
+	mouse: mouse,
+	constraint: {
+		angularStiffness: 0,
+		render: {
+			visible: false
+		}
+	}
+});
+
+render.mouse = mouse;
+Composite.add(world, mouseConstraint);
+
+class moveButton {
+
+	constructor(x, y, minVal, maxVal, direction, type, object) {
+		this.x = x;
+		this.y = y;
+		this.buttonHalfWidth = direction == "horizontal" ? 30 : 15;
+		this.buttonHalfHeight = direction == "horizontal" ? 15 : 30;
+		this.xOriginal = x;
+		this.yOriginal = y;
+		this.minVal= minVal;
+		this.maxVal = maxVal;
+		this.direction = direction;
+		this.object = object;
+		this.isMoving = false;
+		this.type = type;
+		this.setOriginalPositions();
+	}
+	
+	setOriginalPositions() {
+		if(this.object.type == "composite") {
+			for(let i = 0; i<this.object.bodies.length; i++) {
+				let body = this.object.bodies[i];
+				body.originalPosition = {x: body.position.x, y: body.position.y};
+			}
+			
+			for(let i = 0; i<this.object.constraints.length; i++) {
+				let constraint = this.object.constraints[i];
+				constraint.originalPointA = {x: constraint.pointA.x, y: constraint.pointA.y};
+			}
+		}
+		if(this.object.type == "body") {
+			this.object.originalPosition = {x: this.object.position.x, y: this.object.position.y};
+		}
+	}
+
+	moveTo(x, y) {
+		var newVal = this.direction == "horizontal" ? x : y;
+		if(newVal > this.maxVal) {
+			newVal = this.maxVal;
+		} else if (newVal < this.minVal) {
+			newVal = this.minVal;
+		}
+		if(this.direction == "horizontal") {
+			this.x = newVal;
+		} else {
+			this.y = newVal;
+		}
+		if(this.type == "move") {
+			this.moveObject();
+		}
+		if(this.type == "scale") {
+			this.scaleObject();
+		}
+	}
+	
+	intersects(x, y, pointerType) {
+		let boundXRight = this.x + this.buttonHalfWidth;
+		let boundXLeft = this.x - this.buttonHalfWidth;
+		let boundYUp = this.y + this.buttonHalfHeight;
+		let boundYDown = this.y - this.buttonHalfHeight;
+		return (x <= boundXRight && x >= boundXLeft && y <= boundYUp && y >= boundYDown);
+	}
+	
+	moveObject() {
+		let offsetX = this.x - this.xOriginal;
+		let offsetY = this.y - this.yOriginal;
+		
+		if(this.object.type == "composite") {
+			for(let i = 0; i<this.object.bodies.length; i++) {
+				let body = this.object.bodies[i];
+				let originalX = body.originalPosition.x;
+				let originalY = body.originalPosition.y;
+				Matter.Body.setPosition(body, {x: originalX+offsetX, y: originalY+offsetY});
+			}
+			
+			for(let i = 0; i<this.object.constraints.length; i++) {
+				let constraint = this.object.constraints[i];
+				let originalX = constraint.originalPointA.x;
+				let originalY = constraint.originalPointA.y;
+				constraint.pointA = {x: originalX+offsetX, y: originalY+offsetY};
+			}
+		}
+		
+		if(this.object.type == "body") {
+			let offsetX = this.x - this.xOriginal;
+			let offsetY = this.y - this.yOriginal;
+		
+			let originalX = this.object.originalPosition.x;
+			let originalY = this.object.originalPosition.y;
+		
+			Matter.Body.setPosition(this.object, {x: originalX+offsetX, y: originalY+offsetY});
+		}
+	}
+	
+	draw(ctx) {
+	
+		ctx.beginPath();
+		ctx.fillStyle = '#0767c7';
+		if(this.direction == "horizontal") {
+			ctx.rect(this.minVal, this.y-5, this.maxVal-this.minVal, 10);
+			ctx.fill();
+			ctx.arc(this.minVal, this.y, 5, 0, 2 * Math.PI);
+			ctx.arc(this.maxVal, this.y, 5, 0, 2 * Math.PI);
+			ctx.fill();
+			
+		} else {
+			ctx.rect(this.x-5, this.minVal, 10, this.maxVal-this.minVal);
+			ctx.fill();
+			ctx.arc(this.x, this.minVal, 5, 0, 2 * Math.PI);
+			ctx.arc(this.x, this.maxVal, 5, 0, 2 * Math.PI);
+			ctx.fill();
+		}
+		ctx.closePath();
+		
+		ctx.fillStyle = 'white';
+		ctx.strokeStyle = '#0767c7';
+		ctx.lineWidth = 4;
+		
+		let relativeCoordsArrow = [[-10, -5], [20, 0], [0, -7], [15, 12], [-15, 12], [0, -7], [-20, 0], [0, 7], [-15, -12], [15, -12], [0, 7], [10, 0]];
+				
+		let mainAxis = 0;
+		let otherAxis = 1;
+				
+		if(this.direction == "vertical") {
+			mainAxis = 1;
+			otherAxis = 0;
+		}
+		
+		ctx.beginPath();
+			
+		let position = [relativeCoordsArrow[0][mainAxis]+this.x, relativeCoordsArrow[0][otherAxis]+this.y];
+		ctx.moveTo(position[0], position[1]);
+		
+		for(let i = 1; i<relativeCoordsArrow.length; i++) {
+			position[mainAxis]+=relativeCoordsArrow[i][0];
+			position[otherAxis]+=relativeCoordsArrow[i][1];
+			ctx.lineTo(position[0], position[1]);
+		}
+		
+		ctx.fill();
+		ctx.stroke();
+		
+		ctx.closePath();
+	}
+}
+
+var button1 = new moveButton(500, 555, 100, 690, "horizontal", "move", spring);
+var button2 = new moveButton(1000, 330, 25, 575, "vertical", "move", wall);
+
+var buttons = [button1, button2];
+
+var canvas = render.canvas;
+var dragBody = null;
+var mouseIsDown = false;
+
+canvas.addEventListener("pointermove", mouseOver);
+canvas.addEventListener("pointerdown", mouseDown);
+canvas.addEventListener("pointerup", mouseUp);
+canvas.addEventListener("pointerleave", mouseLeave);
+canvas.addEventListener("pointerenter", mouseLeave);
+
+
+function mouseDown(event) {
+	mouseIsDown = true;
+	buttons.forEach((button) => {
+		if(button.intersects(mouse.position.x, mouse.position.y, event.pointerType)) {
+			button.isMoving = true;
+		}
+	});
+}
+
+function mouseUp(event) {
+	mouseIsDown = false;
+	buttons.forEach((button) => {
+		button.isMoving = false;
+	});	
+}
+
+function mouseLeave(event) {
+	releaseMouse();
+	mouseIsDown = false;
+}
+
+function mouseOver(event) {
+	if(mouse.position.y > 530) {
+		if(mouseIsDown) {
+			releaseMouse();
+		}
+	}
+	buttons.forEach((button) => {
+		if(button.isMoving) {
+			button.moveTo(mouse.position.x, mouse.position.y);
+		}
+	});
+}
+
+function releaseMouse() {
+	Matter.Events.trigger(mouseConstraint, "enddrag", { mouse: mouse, body: mouseConstraint.constraint.body });
+	mouseConstraint.constraint.body = null;
+	mouseConstraint.constraint.bodyB = null;
+	mouseConstraint.constraint.pointA = null;
+	mouse.button = -1;
+}
+
+var undragBody = null;
+
+var flyingPigs = [jellyPig, flyPig];
+var flyingPigsFall = [false, false];
+var flyingPigsState = ["", ""];
+var airFrictionValues = [[0.05, 0.02, 0], [0.02, 0, 0]];
+
+Matter.Events.on(engine, 'beforeUpdate', function(event) {
+	
+	piggies.forEach((pig) => checkBounds(pig));
+	piggies.forEach((pig) => limitVelocity(pig));
+	
+	if(springBlock.position.y>550) {
+		Matter.Body.setPosition(springBlock, {x: springBlock.position.x, y: 540});
+		Matter.Body.setAngle(springBlock, 0);
+	}
+	
+	for(let i = 0; i<flyingPigs.length; i++) {
+		if(undragBody == flyingPigs[i] && flyingPigsState[i] == "") {
+			if(!flyingPigsFall[i] && undragBody.velocity.y < -1) {
+				flyingPigsState[i] = "rising";
+			}
+			if(!flyingPigsFall[i] && undragBody.velocity.y >= 0) {
+				flyingPigsState[i] = "falling";
+			}
+			undragBody = null;
+		}
+		
+		if(!flyingPigsFall[i] && !(mouseConstraint.body == flyingPigs[i])) {
+			if(flyingPigsState[i] == "rising" && flyingPigs[i].velocity.y > 0) {
+				flyingPigsFall[i] = true;
+				flyingPigs[i].frictionAir = airFrictionValues[i][0];
+			}
+			if(flyingPigsState[i] == "falling" && flyingPigs[i].velocity.y < 0) {
+				flyingPigsState[i] = "rising";
+				flyingPigs[i].frictionAir = airFrictionValues[i][1];
+			}
+		}
+		
+		if(flyingPigsFall[i]) {
+			if(flyingPigs[i].velocity.y<=0) {
+				flyingPigsFall[i] = false;
+				flyingPigsState[i] = "";
+				flyingPigs[i].frictionAir = airFrictionValues[i][2];
+			}
+		}
+	}
+});
+
+function checkBounds(pig) {
+	if(pig.position.y+pig.velocity.y < pig.radius) {
+		Matter.Body.setPosition(pig, {x: pig.position.x, y: pig.radius });
+		Matter.Body.setVelocity(pig, {x: pig.velocity.x, y: -pig.velocity.y*pig.restitution });
+	}
+	if(pig.position.x+pig.velocity.x < pig.radius) {
+		Matter.Body.setPosition(pig, {x: pig.radius, y: pig.position.y });
+		Matter.Body.setVelocity(pig, {x: -pig.velocity.x*pig.restitution, y: pig.velocity.y });
+	}
+	if(pig.position.y+pig.velocity.y > 550-pig.radius) {
+		Matter.Body.setPosition(pig, {x: pig.position.x, y: 540-pig.radius });
+		Matter.Body.setVelocity(pig, {x: pig.velocity.x, y: -pig.velocity.y*pig.restitution });
+	}
+	if(pig.position.x+pig.velocity.x > worldWidth) {
+		Matter.Body.setPosition(pig, {x: worldWidth-pig.radius, y: pig.position.y });
+		Matter.Body.setVelocity(pig, {x: -pig.velocity.x*pig.restitution, y: pig.velocity.y })
+	}
+}
+
+/* https://stackoverflow.com/questions/59321773/prevent-force-dragging-bodies-through-other-bodies-with-matterjs */
+function limitVelocity(pig) {
+		if (pig.velocity.x > 25.0) {
+			Matter.Body.setVelocity(pig, {x: 25, y: pig.velocity.y });
+		}
+		if (pig.velocity.x < -25.0) {
+			Matter.Body.setVelocity(pig, {x: -25, y: pig.velocity.y });
+		}
+		if (pig.velocity.y > 25.0) {
+			Matter.Body.setVelocity(pig, {x: pig.velocity.x, y: 25 });
+		}
+		if (pig.velocity.y < -25.0) {
+			Matter.Body.setVelocity(pig, {x: pig.velocity.x, y: -25 });
+		}
+		if (pig.positionImpulse.x > 20.0) {
+			pig.positionImpulse.x = 20.0;
+		}
+		if (pig.positionImpulse.y > 20.0) {
+			pig.positionImpulse.y = 20.0;
+		}
+		if (pig.positionImpulse.x < -20.0) {
+			pig.positionImpulse.x = -20.0;
+		}
+		if (pig.positionImpulse.y < -20.0) {
+			pig.positionImpulse.y = -20.0;
+		}
+		if (pig.angularVelocity > 0.2) {
+			Matter.Body.setAngularVelocity(pig, 0.2);
+		}
+		if (pig.angularVelocity < -0.2) {
+			Matter.Body.setAngularVelocity(pig, -0.2);
+		}
+}
+
+Matter.Events.on(mouseConstraint, 'startdrag', function(event) {
+	dragBody = event.body;
+});
+
+Matter.Events.on(mouseConstraint, 'enddrag', function(event) {
+	undragBody = dragBody;
+	dragBody = null;
+});
+
+Matter.Events.on(render, 'afterRender', function(event) {
+	var ctx = render.context;
+	buttons.forEach((button) => button.draw(ctx));
+});
+
+</script>
+</body>
+</html>
