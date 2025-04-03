@@ -389,11 +389,13 @@ canvas.addEventListener("pointerenter", mouseLeave);
 
 function mouseDown(event) {
 	mouseIsDown = true;
-	buttons.forEach((button) => {
+	if(event.pointerType != "touch") {
+		buttons.forEach((button) => {
 		if(button.intersects(mouse.position.x, mouse.position.y, event.pointerType)) {
-			button.isMoving = true;
-		}
-	});
+				button.isMoving = true;
+			}
+		});
+	}
 }
 
 function mouseUp(event) {
@@ -414,6 +416,15 @@ function mouseOver(event) {
 			releaseMouse();
 		}
 	}
+	
+	if(event.pointerType == "touch") {
+		buttons.forEach((button) => {
+		if(!button.isMoving && button.intersects(mouse.position.x, mouse.position.y, event.pointerType)) {
+				button.isMoving = true;
+			}
+		});
+	}
+	
 	buttons.forEach((button) => {
 		if(button.isMoving) {
 			button.moveTo(mouse.position.x, mouse.position.y);
